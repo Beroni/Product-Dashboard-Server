@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UserGet(users *user.Repo) gin.HandlerFunc {
+func UserGet(users user.Getter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		results := users.GetAll()

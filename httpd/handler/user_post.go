@@ -13,7 +13,7 @@ type userPostRequest struct {
 	Password string `json:"passwword"`
 }
 
-func UserPost(users *user.Repo) gin.HandlerFunc {
+func UserPost(users user.Adder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		requestBody := userPostRequest{}

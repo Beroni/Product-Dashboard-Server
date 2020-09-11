@@ -1,5 +1,13 @@
 package user
 
+type Getter interface {
+	GetAll() []User
+}
+
+type Adder interface {
+	Add(user User)
+}
+
 // User Nodel
 type User struct {
 	Email    string `json:"email"`
