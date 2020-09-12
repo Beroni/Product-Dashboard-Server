@@ -23,9 +23,14 @@ func (c Routes) StartGin() {
 		sessionRoutes.POST("/", handlers.SignIn)
 	}
 
-	testRoutes := r.Group("/test")
+	productsRoutes := r.Group("/products")
 	{
-		testRoutes.GET("/", middlewares.JWT(), handlers.Test)
+		productsRoutes.GET("/", middlewares.JWT(), handlers.GetAllProducts)
+		productsRoutes.GET("/:id", middlewares.JWT(), handlers.GetProductById)
+		productsRoutes.POST("/", middlewares.JWT(), handlers.CreateProduct)
+		productsRoutes.PUT("/:id", middlewares.JWT(), handlers.UpdateProduct)
+		productsRoutes.DELETE("/:id", middlewares.JWT(), handlers.DeleteProduct)
+
 	}
 
 	r.Run(":3333")
