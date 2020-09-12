@@ -4,13 +4,13 @@ import (
 	model "cms/src/models"
 	utils "cms/src/util"
 	"context"
-	"fmt"
 	"net/http"
 
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type userPostRequest struct {
@@ -39,15 +39,13 @@ func SignUp(c *gin.Context) {
 
 	error := client.FindOne(context.TODO(), filter).Decode(&result)
 
-	fmt.Println("Resultado ", result)
-
 	if error == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "E-mail already exists",
 		})
 		return
 	}
-
+	newUser.ID = primitive.NewObjectID()
 	newUser.CreatedAt = time.Now()
 	newUser.UpdatedAt = time.Now()
 

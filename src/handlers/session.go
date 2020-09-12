@@ -4,7 +4,6 @@ import (
 	model "cms/src/models"
 	utils "cms/src/util"
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,7 @@ func SignIn(c *gin.Context) {
 
 	client := *utils.MongoConnection("users")
 
-	requestBody := userPostRequest{}
+	requestBody := sessionPostRequest{}
 
 	loggedUser := model.User{
 		Email:    requestBody.Email,
@@ -51,18 +50,11 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	token, error := utils.CreateJWT(result.ID)
-	fmt.Println("ID", result.ID)
-
-	fmt.Println(token)
+	token, error := utils.CreateJWT(result.ID.Hex())
 
 	c.JSON(http.StatusOK, gin.H{
 		"user":  result,
 		"token": token,
 	})
 
-}
-
-func Test(c *gin.Context) {
-	fmt.Println("KJfiwjojewp")
 }
