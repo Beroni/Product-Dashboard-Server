@@ -1,4 +1,4 @@
 dev:
-	go run httpd/main.go
+	go run main.go
 test:
 	go test -cover ./...
