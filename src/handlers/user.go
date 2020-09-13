@@ -13,46 +13,47 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type userPostRequest struct {
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-	Password string `json:"password"`
+type SignUpCredentials struct {
+	Email    string `json:"email" binding:"required"`
+	Name     string `json:"name" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 func SignUp(c *gin.Context) {
 
-	var result model.User
+	isUserDuplicated := model.User{}
+	user := model.User{}
 
 	client := *utils.MongoConnection("users")
 
-	requestBody := userPostRequest{}
-
-	newUser := model.User{
-		Email:    requestBody.Email,
-		Name:     requestBody.Name,
-		Password: requestBody.Password,
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
 	}
 
-	c.Bind(&newUser)
+	if err := user.ValidateSignUp(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid Body"})
+		return
+	}
 
-	filter := bson.D{{"email", newUser.Email}}
+	filter := bson.D{{"email", user.Email}}
 
-	error := client.FindOne(context.TODO(), filter).Decode(&result)
+	error := client.FindOne(context.TODO(), filter).Decode(&isUserDuplicated)
 
 	if error == nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "E-mail already exists",
 		})
 		return
 	}
-	newUser.ID = primitive.NewObjectID()
-	newUser.CreatedAt = time.Now()
-	newUser.UpdatedAt = time.Now()
+	user.ID = primitive.NewObjectID()
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
 
 	// newUser.Password = utils.HashPassword(requestBody.Password)
 
-	client.InsertOne(context.TODO(), newUser)
+	client.InsertOne(context.TODO(), user)
 
-	c.JSON(http.StatusCreated, newUser)
+	c.JSON(http.StatusCreated, user)
 
 }
