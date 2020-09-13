@@ -14,9 +14,9 @@ import (
 )
 
 type productRequest struct {
-	Name     string  `json:"name"`
-	Price    float32 `json:"price"`
-	Quantity uint8   `json:"quantity"`
+	Name     string  `json:"name" binding:"required"`
+	Price    float32 `json:"price" binding:"required"`
+	Quantity uint8   `json:"quantity" binding:"required"`
 }
 
 func GetAllProducts(c *gin.Context) {
@@ -82,43 +82,35 @@ func GetProductById(c *gin.Context) {
 
 func CreateProduct(c *gin.Context) {
 
+	product := model.Product{}
+
 	client := *utils.MongoConnection("products")
 
-	requestBody := productRequest{}
-
-	createdProduct := model.Product{
-		Name:     requestBody.Name,
-		Price:    requestBody.Price,
-		Quantity: requestBody.Quantity,
+	if err := c.ShouldBindJSON(&product); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Missing values"})
+		return
 	}
 
-	c.Bind(&createdProduct)
+	product.ID = primitive.NewObjectID()
+	product.CreatedAt = time.Now()
+	product.UpdatedAt = time.Now()
 
-	createdProduct.ID = primitive.NewObjectID()
-	createdProduct.CreatedAt = time.Now()
-	createdProduct.UpdatedAt = time.Now()
+	client.InsertOne(context.TODO(), product)
 
-	client.InsertOne(context.TODO(), createdProduct)
-
-	c.JSON(http.StatusCreated, createdProduct)
+	c.JSON(http.StatusCreated, product)
 
 }
 
 func UpdateProduct(c *gin.Context) {
 
-	client := *utils.MongoConnection("products")
-
 	product := model.Product{}
 
-	requestBody := productRequest{}
+	client := *utils.MongoConnection("products")
 
-	updatedProduct := model.Product{
-		Name:     requestBody.Name,
-		Price:    requestBody.Price,
-		Quantity: requestBody.Quantity,
+	if err := c.ShouldBindJSON(&product); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Missing values"})
+		return
 	}
-
-	c.Bind(&updatedProduct)
 
 	id := c.Param("id")
 
@@ -134,9 +126,9 @@ func UpdateProduct(c *gin.Context) {
 	filter := bson.D{primitive.E{Key: "_id", Value: objectId}}
 
 	update := bson.D{primitive.E{Key: "$set", Value: bson.D{
-		primitive.E{Key: "name", Value: updatedProduct.Name},
-		primitive.E{Key: "price", Value: updatedProduct.Price},
-		primitive.E{Key: "quantity", Value: updatedProduct.Quantity},
+		primitive.E{Key: "name", Value: product.Name},
+		primitive.E{Key: "price", Value: product.Price},
+		primitive.E{Key: "quantity", Value: product.Quantity},
 		primitive.E{Key: "updated_at", Value: time.Now()},
 	}},
 	}
