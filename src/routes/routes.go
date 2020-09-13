@@ -10,7 +10,7 @@ import (
 type Routes struct {
 }
 
-func (c Routes) StartGin() {
+func (c Routes) StartGin() *gin.Engine {
 	r := gin.Default()
 
 	usersRoutes := r.Group("/users")
@@ -33,5 +33,5 @@ func (c Routes) StartGin() {
 
 	}
 
-	r.Run(":3333")
+	return r
 }
