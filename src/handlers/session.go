@@ -4,6 +4,7 @@ import (
 	model "cms/src/models"
 	utils "cms/src/util"
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,48 +13,46 @@ import (
 
 const UserCollection = "users"
 
-type sessionPostRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+type SignInCredentials struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 func SignIn(c *gin.Context) {
 
-	var result model.User
+	findedUser := model.User{}
+	user := model.User{}
 
 	client := *utils.MongoConnection("users")
 
-	requestBody := sessionPostRequest{}
-
-	loggedUser := model.User{
-		Email:    requestBody.Email,
-		Password: requestBody.Password,
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Missing values"})
+		return
 	}
 
-	c.Bind(&loggedUser)
+	if err := user.ValidateSignIn(); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid Body"})
+		return
+	}
 
-	filter := bson.D{{"email", loggedUser.Email}}
+	filter := bson.D{{"email", user.Email}}
 
-	error := client.FindOne(context.TODO(), filter).Decode(&result)
+	error := client.FindOne(context.TODO(), filter).Decode(&findedUser)
 
-	if error != nil {
-		c.JSON(http.StatusOK, gin.H{
+	fmt.Println(findedUser)
+	fmt.Println(user)
+
+	if error != nil || findedUser.Password != user.Password {
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid Credentials",
 		})
 		return
 	}
 
-	if result.Password != loggedUser.Password {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Invalid Credentials",
-		})
-		return
-	}
-
-	token, error := utils.CreateJWT(result.ID.Hex())
+	token, error := utils.CreateJWT(findedUser.ID.Hex())
 
 	c.JSON(http.StatusOK, gin.H{
-		"user":  result,
+		"user":  findedUser,
 		"token": token,
 	})
 
