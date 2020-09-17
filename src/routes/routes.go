@@ -11,27 +11,19 @@ type Routes struct {
 }
 
 func (c Routes) StartGin() *gin.Engine {
-	r := gin.Default()
+	r := gin.New()
 
-	usersRoutes := r.Group("/users")
-	{
-		usersRoutes.POST("/", handlers.SignUp)
-	}
+	r.Use(middlewares.CORS())
 
-	sessionRoutes := r.Group("/sessions")
-	{
-		sessionRoutes.POST("/", handlers.SignIn)
-	}
+	r.POST("/users", handlers.SignUp)
 
-	productsRoutes := r.Group("/products")
-	{
-		productsRoutes.GET("/", middlewares.JWT(), handlers.GetAllProducts)
-		productsRoutes.GET("/:id", middlewares.JWT(), handlers.GetProductById)
-		productsRoutes.POST("/", middlewares.JWT(), handlers.CreateProduct)
-		productsRoutes.PUT("/:id", middlewares.JWT(), handlers.UpdateProduct)
-		productsRoutes.DELETE("/:id", middlewares.JWT(), handlers.DeleteProduct)
+	r.POST("/sessions", handlers.SignIn)
 
-	}
+	r.GET("/products", middlewares.JWT(), handlers.GetAllProducts)
+	r.GET("/products/:id", middlewares.JWT(), handlers.GetProductById)
+	r.POST("/products", middlewares.JWT(), handlers.CreateProduct)
+	r.PUT("/products/:id", middlewares.JWT(), handlers.UpdateProduct)
+	r.DELETE("/products/:id", middlewares.JWT(), handlers.DeleteProduct)
 
 	return r
 }

@@ -4,7 +4,6 @@ import (
 	model "cms/src/models"
 	utils "cms/src/util"
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -38,9 +37,6 @@ func SignIn(c *gin.Context) {
 	filter := bson.D{{"email", user.Email}}
 
 	error := client.FindOne(context.TODO(), filter).Decode(&findedUser)
-
-	fmt.Println(findedUser)
-	fmt.Println(user)
 
 	if error != nil || findedUser.Password != user.Password {
 		c.JSON(http.StatusBadRequest, gin.H{

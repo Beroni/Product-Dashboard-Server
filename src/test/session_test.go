@@ -4,7 +4,6 @@ import (
 	"bytes"
 	gin "cms/src/routes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,8 +29,6 @@ func TestSignIn(t *testing.T) {
 	ts := httptest.NewServer(server)
 
 	defer ts.Close()
-
-	fmt.Println()
 
 	resp, _ := http.Post(ts.URL+"/users", "application/json", userBytes)
 
