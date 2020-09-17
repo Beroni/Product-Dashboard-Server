@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,7 +21,9 @@ type SignInCredentials struct {
 func TestSignIn(t *testing.T) {
 	var r gin.Routes
 
-	user := SignUpCredentials{"signinaccount@gmail.com", "SignIn", "123456"}
+	userEmail := faker.Email()
+
+	user := SignUpCredentials{userEmail, "SignIn", "123456"}
 	userBytes := new(bytes.Buffer)
 
 	json.NewEncoder(userBytes).Encode(user)
@@ -34,7 +37,7 @@ func TestSignIn(t *testing.T) {
 
 	assert.Equal(t, resp.StatusCode, 201, "They should be equal")
 
-	loginUser := SignInCredentials{"signinaccount@gmail.com", "123456"}
+	loginUser := SignInCredentials{userEmail, "123456"}
 
 	loginBytes := new(bytes.Buffer)
 

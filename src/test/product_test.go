@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,6 +30,8 @@ type sessionResponse struct {
 func TestProduct(t *testing.T) {
 	var r gin.Routes
 
+	userEmail := faker.Email()
+
 	requestBody := createProduct{"Nice Product", 99.99, 2}
 	reqBodyBytes := new(bytes.Buffer)
 
@@ -37,7 +40,7 @@ func TestProduct(t *testing.T) {
 	server := r.StartGin()
 	ts := httptest.NewServer(server)
 
-	user := SignUpCredentials{"createproductaccount@gmail.com", "SignIn", "123456"}
+	user := SignUpCredentials{userEmail, "SignIn", "123456"}
 	userBytes := new(bytes.Buffer)
 
 	json.NewEncoder(userBytes).Encode(user)
@@ -50,7 +53,7 @@ func TestProduct(t *testing.T) {
 
 	assert.Equal(t, resp.StatusCode, 201, "They should be equal")
 
-	loginUser := SignInCredentials{"createproductaccount@gmail.com", "123456"}
+	loginUser := SignInCredentials{userEmail, "123456"}
 
 	loginBytes := new(bytes.Buffer)
 

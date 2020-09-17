@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +22,9 @@ type SignUpCredentials struct {
 func TestSignUp(t *testing.T) {
 	var r gin.Routes
 
-	requestBody := SignUpCredentials{"testUser@gmail.com", "John Doe", "123456"}
+	userEmail := faker.Email()
+
+	requestBody := SignUpCredentials{userEmail, "John Doe", "123456"}
 	reqBodyBytes := new(bytes.Buffer)
 
 	json.NewEncoder(reqBodyBytes).Encode(requestBody)
