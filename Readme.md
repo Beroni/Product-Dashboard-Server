@@ -1,4 +1,4 @@
-## Backend Getty.IO
+# Backend Getty.IO
 
 ### Challenge
 
@@ -15,3 +15,31 @@ The web app should be able to list, create, update and remove the data. :heavy_c
 ### Extra
 
 - Put some security layer (like JWT) to protect your endpoints :heavy_check_mark:
+
+## Postman
+
+Collection Link
+
+https://www.getpostman.com/collections/0d2a6c09ba025cf2986f
+
+Enviroment Link
+
+## How to run
+
+1. Clone Repository
+
+```bash
+git clone https://github.com/Beroni/backend-getty
+```
+
+2. Run Project
+
+```bash
+  make dev
+```
+
+2. Run tests
+
+```bash
+  make test
+```
