@@ -18,11 +18,12 @@ The web app should be able to list, create, update and remove the data. :heavy_c
 
 ## Postman
 
-Collection Link
+[Collection Link](https://www.getpostman.com/collections/0d2a6c09ba025cf2986f)
 
-https://www.getpostman.com/collections/0d2a6c09ba025cf2986f
 
-Enviroment Link
+[Environment Link](https://github.com/Beroni/backend-getty/blob/master/Getty.postman_environment.json)
+
+
 
 ## How to run
 
